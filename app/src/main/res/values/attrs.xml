@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DashBoardView">
+        <attr name="dbv_backColor" format="color" />
+        <attr name="dbv_startColor" format="color" />
+        <attr name="dbv_middleColor" format="color" />
+        <attr name="dbv_endColor" format="color" />
+        <attr name="dbv_cursorColor" format="color" />
+        <attr name="dbv_cursorWidth" format="dimension" />
+        <attr name="dbv_rimWidth" format="dimension" />
+        <attr name="dbv_cursorOffset" format="dimension" />
+        <attr name="dbv_rimOffset" format="dimension" />
+        <attr name="dbv_rimStartAngle" format="integer" />
+        <attr name="dbv_rimSweepAngle" format="integer" />
+        <attr name="dbv_cursorSweepAngle" format="integer" />
+        <attr name="dbv_textColor" format="color" />
+        <attr name="dbv_textSize" format="dimension" />
+    </declare-styleable>
+
+</resources>
