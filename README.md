@@ -27,7 +27,7 @@ A customized view project. DashBoardView. 仪表盘控件.
 
 # Visual Effects
 
-![screenshot](/screenshots/screen_shot_1.png)
+![screenshot](/app/screenshots/screen_shot_1.png)
 
 # TODO
 
