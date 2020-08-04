@@ -2,6 +2,7 @@
 <resources>
     <declare-styleable name="DashBoardView">
         <attr name="dbv_backColor" format="color" />
+        <attr name="dbv_outerRimWidth" format="dimension" />
         <attr name="dbv_startColor" format="color" />
         <attr name="dbv_middleColor" format="color" />
         <attr name="dbv_endColor" format="color" />
@@ -13,8 +14,13 @@
         <attr name="dbv_rimStartAngle" format="integer" />
         <attr name="dbv_rimSweepAngle" format="integer" />
         <attr name="dbv_cursorSweepAngle" format="integer" />
-        <attr name="dbv_textColor" format="color" />
-        <attr name="dbv_textSize" format="dimension" />
+        <attr name="dbv_desc" format="string" />
+        <attr name="dbv_descColor" format="color" />
+        <attr name="dbv_descSize" format="dimension" />
+        <attr name="dbv_title" format="string" />
+        <attr name="dbv_titleColor" format="color" />
+        <attr name="dbv_titleSize" format="dimension" />
+        <attr name="dbv_textPadding" format="dimension" />
+        <attr name="dbv_progress" format="integer" />
     </declare-styleable>
-
 </resources>
