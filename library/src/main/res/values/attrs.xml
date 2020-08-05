@@ -22,5 +22,6 @@
         <attr name="dbv_titleSize" format="dimension" />
         <attr name="dbv_textPadding" format="dimension" />
         <attr name="dbv_progress" format="integer" />
+        <attr name="dbv_animDuration" format="integer" />
     </declare-styleable>
 </resources>

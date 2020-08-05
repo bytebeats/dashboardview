@@ -1,5 +1,6 @@
 package me.bytebeats.dbv
 
+import android.animation.ValueAnimator
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.*
@@ -34,6 +35,7 @@ class DashBoardView : View {
         set(value) {
             field = value
             backPaint.strokeWidth = value
+            invalidate()
         }
     var rimStartColor: Int = DEFAULT_START_COLOR
     var rimMiddleColor: Int = DEFAULT_MIDDLE_COLOR
@@ -43,17 +45,21 @@ class DashBoardView : View {
         set(value) {
             field = value
             cursorPaint.strokeWidth = value
+            invalidate()
         }
     var rimWidth: Float = DEFAULT_RIM_WIDTH
         set(value) {
             field = value
             rimPaint.strokeWidth = value
+            invalidate()
         }
     var rimStartAngle: Int = DEFAULT_START_ANGLE
     var rimSweepAngle: Int = DEFAULT_SWEEP_ANGLE
+    var evalutedRimSweepAngle: Float = 0.0F
     var cursorOffset: Float = DEFAULT_CURSOR_OFFSET
     var rimOffset: Float = DEFAULT_RIM_OFFSET
     var cursorSweepAngle: Int = DEFAULT_CURSOR_SWEEP_ANGLE
+    var evaluatedCursorSweepAngle: Float = 0.0F
     var dbvDesc: String = ""
         set(value) {
             field = value
@@ -61,12 +67,15 @@ class DashBoardView : View {
         }
     var dbvDescColor: Int = DEFAULT_DESC_COLOR
         set(value) {
+            field = value
             descPaint.color = value
+            invalidate()
         }
     var dbvDescSize: Float = DEFAULT_DESC_SIZE
         set(value) {
             field = value
             descPaint.textSize = value
+            invalidate()
         }
     var dbvTitle: String = ""
         set(value) {
@@ -77,11 +86,13 @@ class DashBoardView : View {
         set(value) {
             field = value
             titlePaint.color = value
+            invalidate()
         }
     var dbvTitleSize: Float = DEFAULT_TITLE_SIZE
         set(value) {
             field = value
             titlePaint.textSize = value
+            invalidate()
         }
     var dbvTextPadding: Float = 0.0F
         set(value) {
@@ -90,9 +101,9 @@ class DashBoardView : View {
         }
     var progress: Int = 0
         set(value) {
-            field = if (value == 0) {
+            field = if (value <= 0) {
                 0
-            } else if (value == DEFAULT_MAX_PROGRESS) {
+            } else if (value >= DEFAULT_MAX_PROGRESS) {
                 DEFAULT_MAX_PROGRESS
             } else {
                 (value % DEFAULT_MAX_PROGRESS + DEFAULT_MAX_PROGRESS) % DEFAULT_MAX_PROGRESS
@@ -122,7 +133,6 @@ class DashBoardView : View {
             style = Paint.Style.STROKE
             strokeJoin = Paint.Join.MITER
             strokeCap = Paint.Cap.ROUND
-            strokeMiter = 60f
         }
     }
     private val cursorPaint by lazy {
@@ -169,6 +179,26 @@ class DashBoardView : View {
             cursorColor,
             cursorColor
         )
+    }
+    var animDuration: Int = DEFAULT_ANIMATION_DURATION
+        set(value) {
+            field = value
+            rimValAnimator?.duration = value.toLong()
+            cursorValAnimator?.duration = value.toLong()
+        }
+    var rimValAnimator: ValueAnimator? = null
+    var cursorValAnimator: ValueAnimator? = null
+    val rimAnimUpdateListener by lazy {
+        ValueAnimator.AnimatorUpdateListener {
+            computeRimSweepValue(it.animatedValue as Float)
+            invalidate()
+        }
+    }
+    val cursorAnimUpdateListener by lazy {
+        ValueAnimator.AnimatorUpdateListener {
+            computeCursorSweepValue(it.animatedValue as Float)
+            invalidate()
+        }
     }
 
     private fun initAttrs(attrs: AttributeSet?) {
@@ -235,10 +265,7 @@ class DashBoardView : View {
                     DEFAULT_DESC_SIZE
                 )
                 dbvDesc = getString(R.styleable.DashBoardView_dbv_desc) ?: ""
-                dbvTitleColor = getColor(
-                    R.styleable.DashBoardView_dbv_titleColor,
-                    DEFAULT_TITLE_COLOR
-                )
+                dbvTitleColor = getColor(R.styleable.DashBoardView_dbv_titleColor, DEFAULT_TITLE_COLOR)
                 dbvTitleSize = getDimension(
                     R.styleable.DashBoardView_dbv_titleSize,
                     DEFAULT_TITLE_SIZE
@@ -246,6 +273,7 @@ class DashBoardView : View {
                 dbvTitle = getString(R.styleable.DashBoardView_dbv_title) ?: ""
                 progress = getInt(R.styleable.DashBoardView_dbv_progress, 0)
                 dbvTextPadding = getDimension(R.styleable.DashBoardView_dbv_textPadding, 0.0F)
+                animDuration = getInt(R.styleable.DashBoardView_dbv_animDuration, DEFAULT_ANIMATION_DURATION)
             } finally {
                 recycle()
             }
@@ -271,45 +299,97 @@ class DashBoardView : View {
             else -> requestedHeight.coerceAtMost(desiredHeight)
         }
         setMeasuredDimension(width, height)
-        compute()
+        computeSrcPoint()
     }
 
-    private fun compute() {//计算加点坐标和半径
+    private fun computeSrcPoint() {//计算加点坐标和半径
         centerX = (measuredWidth - paddingLeft - paddingBottom) / 2F + paddingLeft
         centerY = (measuredHeight - paddingTop - paddingBottom) / 2F + paddingTop
         radius =
             (measuredWidth - paddingLeft - paddingBottom).coerceAtMost(measuredHeight - paddingTop - paddingBottom) / 2F - outerRimWidth
     }
 
+    private fun computeRimSweepValue(sweepAngle: Float) {
+        evalutedRimSweepAngle = sweepAngle
+    }
+
+    private fun computeCursorSweepValue(sweepAngle: Float) {
+        evaluatedCursorSweepAngle = sweepAngle
+    }
+
+    fun startAnims() {
+        startRimAnim()
+        startCursorAnim()
+    }
+
+    fun startRimAnim() {
+        if (rimValAnimator == null) {
+            rimValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 98F, rimSweepAngle)
+            rimValAnimator!!.duration = animDuration.toLong()
+            rimValAnimator!!.addUpdateListener(rimAnimUpdateListener)
+        }
+        rimValAnimator?.start()
+    }
+
+    fun startCursorAnim() {
+        if (cursorValAnimator == null) {
+            cursorValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 165F, getCursorStartAngle())
+            cursorValAnimator!!.duration = animDuration.toLong()
+            cursorValAnimator!!.addUpdateListener(cursorAnimUpdateListener)
+        }
+        cursorValAnimator?.start()
+    }
+
     override fun draw(canvas: Canvas?) {
         super.draw(canvas)
         canvas?.drawCircle(centerX, centerY, radius, backPaint)
         rimPaint.shader = rimSweepGradient
-        canvas?.drawArc(
-            RectF(
-                centerX - radius + rimDiff(),
-                centerY - radius + rimDiff(),
-                centerX + radius - rimDiff(),
-                centerY + radius - rimDiff()
-            ), rimStartAngle.toFloat(), rimSweepAngle.toFloat(), false, rimPaint
-        )
+        if (rimValAnimator == null) {
+            canvas?.drawArc(
+                RectF(
+                    centerX - radius + rimDiff(),
+                    centerY - radius + rimDiff(),
+                    centerX + radius - rimDiff(),
+                    centerY + radius - rimDiff()
+                ), rimStartAngle.toFloat(), rimSweepAngle.toFloat(), false, rimPaint
+            )
+
+        } else {
+            canvas?.drawArc(
+                RectF(
+                    centerX - radius + rimDiff(),
+                    centerY - radius + rimDiff(),
+                    centerX + radius - rimDiff(),
+                    centerY + radius - rimDiff()
+                ), rimStartAngle.toFloat(), evalutedRimSweepAngle, false, rimPaint
+            )
+
+        }
         cursorPaint.shader = cursorSweepGradient
-        canvas?.drawArc(
-            RectF(
-                centerX - radius + cursorDiff(),
-                centerY - radius + cursorDiff(),
-                centerX + radius - cursorDiff(),
-                centerY + radius - cursorDiff()
-            ), getCursorStartAngle(), cursorSweepAngle.toFloat(), false, cursorPaint
-        )
+        if (cursorValAnimator == null) {
+            canvas?.drawArc(
+                RectF(
+                    centerX - radius + cursorDiff(),
+                    centerY - radius + cursorDiff(),
+                    centerX + radius - cursorDiff(),
+                    centerY + radius - cursorDiff()
+                ), getCursorStartAngle(), cursorSweepAngle.toFloat(), false, cursorPaint
+            )
+        } else {
+            canvas?.drawArc(
+                RectF(
+                    centerX - radius + cursorDiff(), centerY - radius + cursorDiff(),
+                    centerX + radius - cursorDiff(),
+                    centerY + radius - cursorDiff()
+                ), evaluatedCursorSweepAngle, cursorSweepAngle.toFloat(), false, cursorPaint
+            )
+        }
         val descSizes = measureText(dbvDesc, descPaint)
         canvas?.drawText(dbvDesc, centerX - descSizes[0] / 2, centerY - descSizes[1] - dbvTextPadding / 2, descPaint)
         val titleSizes = measureText(dbvTitle, titlePaint)
         canvas?.drawText(
-            dbvTitle,
-            centerX - titleSizes[0] / 2,
-            centerY + titleSizes[1] + dbvTextPadding / 2,
-            titlePaint
+            dbvTitle, centerX - titleSizes[0] / 2,
+            centerY + titleSizes[1] + dbvTextPadding / 2, titlePaint
         )
     }
 
@@ -348,5 +428,6 @@ class DashBoardView : View {
         const val DEFAULT_CURSOR_SWEEP_ANGLE = 3
         const val DEFAULT_MAX_PROGRESS = 100
         const val DEFAULT_OUTER_STROKE_WIDTH = 5F
+        const val DEFAULT_ANIMATION_DURATION = 3 * 1000
     }
 }
