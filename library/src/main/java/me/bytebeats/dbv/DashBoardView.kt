@@ -188,13 +188,13 @@ class DashBoardView : View {
         }
     var rimValAnimator: ValueAnimator? = null
     var cursorValAnimator: ValueAnimator? = null
-    val rimAnimUpdateListener by lazy {
+    private val rimAnimUpdateListener by lazy {
         ValueAnimator.AnimatorUpdateListener {
             computeRimSweepValue(it.animatedValue as Float)
             invalidate()
         }
     }
-    val cursorAnimUpdateListener by lazy {
+    private val cursorAnimUpdateListener by lazy {
         ValueAnimator.AnimatorUpdateListener {
             computeCursorSweepValue(it.animatedValue as Float)
             invalidate()
@@ -324,7 +324,7 @@ class DashBoardView : View {
 
     fun startRimAnim() {
         if (rimValAnimator == null) {
-            rimValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 98F, rimSweepAngle)
+            rimValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 0F, rimSweepAngle)
             rimValAnimator!!.duration = animDuration.toLong()
             rimValAnimator!!.addUpdateListener(rimAnimUpdateListener)
         }
@@ -333,7 +333,7 @@ class DashBoardView : View {
 
     fun startCursorAnim() {
         if (cursorValAnimator == null) {
-            cursorValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 165F, getCursorStartAngle())
+            cursorValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 135F, getCursorStartAngle())
             cursorValAnimator!!.duration = animDuration.toLong()
             cursorValAnimator!!.addUpdateListener(cursorAnimUpdateListener)
         }
@@ -353,7 +353,6 @@ class DashBoardView : View {
                     centerY + radius - rimDiff()
                 ), rimStartAngle.toFloat(), rimSweepAngle.toFloat(), false, rimPaint
             )
-
         } else {
             canvas?.drawArc(
                 RectF(
@@ -363,7 +362,6 @@ class DashBoardView : View {
                     centerY + radius - rimDiff()
                 ), rimStartAngle.toFloat(), evalutedRimSweepAngle, false, rimPaint
             )
-
         }
         cursorPaint.shader = cursorSweepGradient
         if (cursorValAnimator == null) {
@@ -408,6 +406,7 @@ class DashBoardView : View {
     private fun cursorDiff(): Float = cursorOffset + cursorWidth
 
     companion object {
+        private val TAG = DashBoardView.javaClass.simpleName
         val DEFAULT_DESC_COLOR = Color.parseColor("#A6A9B6")
         const val DEFAULT_DESC_SIZE = 28F
         val DEFAULT_TITLE_COLOR = Color.parseColor("#07B360")
