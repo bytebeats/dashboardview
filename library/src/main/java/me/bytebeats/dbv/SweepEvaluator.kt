@@ -2,7 +2,7 @@ package me.bytebeats.dbv
 
 import android.animation.TimeInterpolator
 import android.animation.TypeEvaluator
-import android.util.Log
+import me.bytebeats.dbv.intplt.SpringInterpolator
 
 /**
  * @author <a href="https://github.com/bytebeats">bytebeats</a>

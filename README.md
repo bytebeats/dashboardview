@@ -32,4 +32,3 @@ A customized view project. DashBoardView. 仪表盘控件.
 # TODO
 
 * Texts around the edge of the DashBoardView
-* Added more TimeInterpolator.
