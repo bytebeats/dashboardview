@@ -1,4 +1,4 @@
-package me.bytebeats.dbv.intplt
+package me.bytebeats.dbv.tplt
 
 /**
  * @author <a href="https://github.com/bytebeats">bytebeats</a>
