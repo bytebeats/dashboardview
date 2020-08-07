@@ -7,7 +7,8 @@ import android.graphics.*
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
-import android.view.animation.BounceInterpolator
+import me.bytebeats.dbv.tplt.BaseTimeInterpolator
+import me.bytebeats.dbv.tplt.SpringInterpolator
 
 /**
  * @author <a href="https://github.com/bytebeats">bytebeats</a>
@@ -188,13 +189,31 @@ class DashBoardView : View {
             cursorValAnimator?.duration = value.toLong()
         }
     var rimValAnimator: ValueAnimator? = null
-    var cursorValAnimator: ValueAnimator? = null
+    private val rimSweepEvaluator: SweepEvaluator by lazy { SweepEvaluator(rimInterpolator) }
+    var rimInterpolator: BaseTimeInterpolator = SpringInterpolator()
+        set(value) {
+            field = value
+            rimSweepEvaluator.timeInterpolator = value
+            rimValAnimator = ValueAnimator.ofObject(rimSweepEvaluator, 0F, rimSweepAngle)
+            rimValAnimator!!.duration = animDuration.toLong()
+            rimValAnimator!!.addUpdateListener(rimAnimUpdateListener)
+        }
     private val rimAnimUpdateListener by lazy {
         ValueAnimator.AnimatorUpdateListener {
             computeRimSweepValue(it.animatedValue as Float)
             invalidate()
         }
     }
+    var cursorValAnimator: ValueAnimator? = null
+    private val cursorSweepEvaluator: SweepEvaluator by lazy { SweepEvaluator(cursorInterpolator) }
+    var cursorInterpolator: BaseTimeInterpolator = SpringInterpolator()
+        set(value) {
+            field = value
+            cursorSweepEvaluator.timeInterpolator = value
+            cursorValAnimator = ValueAnimator.ofObject(cursorSweepEvaluator, 0F, rimSweepAngle)
+            cursorValAnimator!!.duration = animDuration.toLong()
+            cursorValAnimator!!.addUpdateListener(cursorAnimUpdateListener)
+        }
     private val cursorAnimUpdateListener by lazy {
         ValueAnimator.AnimatorUpdateListener {
             computeCursorSweepValue(it.animatedValue as Float)
@@ -325,7 +344,7 @@ class DashBoardView : View {
 
     fun startRimAnim() {
         if (rimValAnimator == null) {
-            rimValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 0F, rimSweepAngle)
+            rimValAnimator = ValueAnimator.ofObject(rimSweepEvaluator, 0F, rimSweepAngle)
             rimValAnimator!!.duration = animDuration.toLong()
             rimValAnimator!!.addUpdateListener(rimAnimUpdateListener)
         }
@@ -334,7 +353,7 @@ class DashBoardView : View {
 
     fun startCursorAnim() {
         if (cursorValAnimator == null) {
-            cursorValAnimator = ValueAnimator.ofObject(SweepEvaluator(), 135F, getCursorStartAngle())
+            cursorValAnimator = ValueAnimator.ofObject(cursorSweepEvaluator, 135F, getCursorStartAngle())
             cursorValAnimator!!.duration = animDuration.toLong()
             cursorValAnimator!!.addUpdateListener(cursorAnimUpdateListener)
         }

@@ -24,6 +24,12 @@ A customized view project. DashBoardView. 仪表盘控件.
         app:layout_constraintTop_toTopOf="parent" />
 
 ```
+ Added TimeInterpolators. Used as below:
+ ```
+    DashBoardView.rimInterpolator = BounceInterpolator()
+    // or
+    DashBoardView.cursorInterpolator = SpringInterpolator()
+ ```
 
 # Visual Effects
 
