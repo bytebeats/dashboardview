@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
@@ -23,6 +24,26 @@ android {
         }
     }
 
+    afterEvaluate {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    from components.release
+
+                    groupId = 'me.bytebeats'
+                    artifactId = 'final'
+                    version = '1.0.0'
+                }
+
+                debug(MavenPublication) {
+                    from components.debug
+                    groupId = 'me.bytebeats'
+                    artifactId = 'final-debug'
+                    version = '1.0.0'
+                }
+            }
+        }
+    }
 }
 
 dependencies {
