@@ -426,7 +426,7 @@ class DashBoardView : View {
     private fun cursorDiff(): Float = cursorOffset + cursorWidth
 
     companion object {
-        private val TAG = DashBoardView.javaClass.simpleName
+        private val TAG = DashBoardView::class.java.simpleName
         val DEFAULT_DESC_COLOR = Color.parseColor("#A6A9B6")
         const val DEFAULT_DESC_SIZE = 28F
         val DEFAULT_TITLE_COLOR = Color.parseColor("#07B360")

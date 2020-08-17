@@ -11,7 +11,7 @@ import me.bytebeats.dbv.tplt.SpringInterpolator
  */
 class SweepEvaluator(var timeInterpolator: TimeInterpolator = SpringInterpolator()) : TypeEvaluator<Float> {
     companion object {
-        private val TAG = SweepEvaluator.javaClass.simpleName
+        private val TAG = SweepEvaluator::class.java.simpleName
     }
 
     override fun evaluate(fraction: Float, startValue: Float, endValue: Float): Float {

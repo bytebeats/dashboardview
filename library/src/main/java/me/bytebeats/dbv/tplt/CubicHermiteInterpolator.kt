@@ -11,9 +11,6 @@ class CubicHermiteInterpolator : BaseTimeInterpolator() {
     private fun cubicHermite(t: Float, start: Float, end: Float, tangent0: Float, tangent1: Float): Float {
         val t2 = t * t
         val t3 = t2 * t
-        return (2 * t3 - 3 * t2 + 1) * start
-        +(t3 - 2 * t2 + t) * tangent0
-        +(-2 * t3 + 3 * t2) * end
-        +(t3 - t2) * tangent1
+        return (2 * t3 - 3 * t2 + 1) * start + (t3 - 2 * t2 + t) * tangent0 + (-2 * t3 + 3 * t2) * end + (t3 - t2) * tangent1
     }
 }
