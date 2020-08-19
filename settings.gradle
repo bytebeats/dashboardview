@@ -1,3 +1,2 @@
-rootProject.name='dashboardview'
+include ':dbv'
 include ':app'
-include ':library'
