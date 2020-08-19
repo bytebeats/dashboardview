@@ -3,10 +3,8 @@ package me.bytebeats.sample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.view.animation.AnticipateInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.SpinnerAdapter
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
 import me.bytebeats.dbv.DashBoardView
