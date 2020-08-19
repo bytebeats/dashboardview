@@ -1,6 +1,20 @@
 # dashboardview
 A customized view project. DashBoardView. 仪表盘控件.
 
+# Adding to your project
+* Add following configuration in your build.gradle file.
+
+```
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    implementation 'me.bytebeats:dashboardview:1.0.0'
+}
+```
+
 # Usage
 
 ```
