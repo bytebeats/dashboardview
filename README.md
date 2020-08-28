@@ -1,6 +1,12 @@
 # dashboardview
 A customized view project. DashBoardView. 仪表盘控件.
 
+# Reference
+[Publish your Android library to jCenter](https://medium.com/@LopezMikhael/publish-your-android-library-to-jcenter-5c6df287db11)
+# Potential Issues
+* Skipping upload for missing file 'xx/../pom-default.xml'
+  * Run <b> ./gradlew `--stacktrace --info` clean build generatePomFileFor`xxx`Publication bintrayUpload -PbintrayUser=<bintray name> -PbintrayKey=<bintray key> -PdryRun=false</b> 
+    * where, `--stacktrace --info` is for debugging and optional; `xxx` means your publication name, in my case, it's `MyPublication`
 # Adding to your project
 * Add following configuration in your build.gradle file.
 
