@@ -23,5 +23,9 @@
         <attr name="dbv_textPadding" format="dimension" />
         <attr name="dbv_progress" format="integer" />
         <attr name="dbv_animDuration" format="integer" />
+        <attr name="dbv_titleMode" format="enum">
+            <enum name="autoSize" value="0" />
+            <enum name="multiline" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

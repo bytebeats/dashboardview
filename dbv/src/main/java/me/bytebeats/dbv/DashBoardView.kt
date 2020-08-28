@@ -5,6 +5,9 @@ import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.*
 import android.os.Build
+import android.text.Layout
+import android.text.StaticLayout
+import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.View
 import me.bytebeats.dbv.tplt.BaseTimeInterpolator
@@ -32,6 +35,7 @@ class DashBoardView : View {
         initAttrs(attrs)
     }
 
+    var titleMode: Int = 0
     var backColor: Int = DEFAULT_BACK_COLOR
     var outerRimWidth: Float = DEFAULT_OUTER_STROKE_WIDTH
         set(value) {
@@ -157,7 +161,7 @@ class DashBoardView : View {
         }
     }
     private val titlePaint by lazy {
-        Paint().apply {
+        TextPaint().apply {
             isAntiAlias = true
             isDither = true
             style = Paint.Style.FILL
@@ -224,6 +228,10 @@ class DashBoardView : View {
     private fun initAttrs(attrs: AttributeSet?) {
         context.theme.obtainStyledAttributes(attrs, R.styleable.DashBoardView, 0, 0).apply {
             try {
+                titleMode = getInteger(
+                    R.styleable.DashBoardView_dbv_titleMode,
+                    0
+                )
                 backColor = getColor(
                     R.styleable.DashBoardView_dbv_backColor,
                     DEFAULT_BACK_COLOR
@@ -323,10 +331,10 @@ class DashBoardView : View {
     }
 
     private fun computeSrcPoint() {//计算加点坐标和半径
-        centerX = (measuredWidth - paddingLeft - paddingBottom) / 2F + paddingLeft
+        centerX = (measuredWidth - paddingLeft - paddingRight) / 2F + paddingLeft
         centerY = (measuredHeight - paddingTop - paddingBottom) / 2F + paddingTop
         radius =
-            (measuredWidth - paddingLeft - paddingBottom).coerceAtMost(measuredHeight - paddingTop - paddingBottom) / 2F - outerRimWidth
+            (measuredWidth - paddingLeft - paddingRight).coerceAtMost(measuredHeight - paddingTop - paddingBottom) / 2F - outerRimWidth
     }
 
     private fun computeRimSweepValue(sweepAngle: Float) {
@@ -360,8 +368,8 @@ class DashBoardView : View {
         cursorValAnimator?.start()
     }
 
-    override fun draw(canvas: Canvas?) {
-        super.draw(canvas)
+    override fun onDraw(canvas: Canvas?) {
+        super.onDraw(canvas)
         canvas?.drawCircle(centerX, centerY, radius, backPaint)
         rimPaint.shader = rimSweepGradient
         if (rimValAnimator == null) {
@@ -404,11 +412,45 @@ class DashBoardView : View {
         }
         val descSizes = measureText(dbvDesc, descPaint)
         canvas?.drawText(dbvDesc, centerX - descSizes[0] / 2, centerY - descSizes[1] - dbvTextPadding / 2, descPaint)
-        val titleSizes = measureText(dbvTitle, titlePaint)
-        canvas?.drawText(
-            dbvTitle, centerX - titleSizes[0] / 2,
-            centerY + titleSizes[1] + dbvTextPadding / 2, titlePaint
-        )
+        titlePaint.textSize = dbvTitleSize
+        var titleSizes = measureText(dbvTitle, titlePaint)
+        val maxTextWidth = measuredWidth - rimDiff() * 2 - cursorDiff() * 2 - paddingLeft - paddingRight
+        if (titleMode == 0) {//autoSize
+            while (titleSizes[0] > maxTextWidth) {
+                titlePaint.textSize = titlePaint.textSize - 1
+                titleSizes = measureText(dbvTitle, titlePaint)
+            }
+            canvas?.drawText(
+                dbvTitle, centerX - titleSizes[0] / 2,
+                centerY + titleSizes[1] + dbvTextPadding / 2, titlePaint
+            )
+        } else {//multiline
+            val staticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                StaticLayout.Builder
+                    .obtain(dbvTitle, 0, dbvTitle.length, titlePaint, maxTextWidth.toInt())
+                    .setAlignment(Layout.Alignment.ALIGN_CENTER)
+                    .build()
+            } else {
+                StaticLayout(
+                    dbvTitle,
+                    0,
+                    dbvTitle.length,
+                    titlePaint,
+                    maxTextWidth.toInt(),
+                    Layout.Alignment.ALIGN_CENTER,
+                    0.0f,
+                    0.0f,
+                    false
+                )
+            }
+            canvas?.save()
+            canvas?.translate(
+                if (titleSizes[0] > maxTextWidth) paddingLeft + rimDiff() + cursorDiff() else paddingLeft + rimDiff() + cursorDiff() + maxTextWidth / 2 - titleSizes[0] / 2,
+                centerY - dbvTextPadding / 2 - titleSizes[1] / 2
+            )
+            staticLayout.draw(canvas)
+            canvas?.restore()
+        }
     }
 
     private fun measureText(text: String, paint: Paint): FloatArray {
