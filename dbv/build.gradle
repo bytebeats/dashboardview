@@ -40,7 +40,7 @@ dependencies {
 // https://medium.com/@LopezMikhael/publish-your-android-library-to-jcenter-5c6df287db11
 def libGroupId = 'me.bytebeats'
 def libArtifactId = 'dbv'
-def libVersion = '1.0.1'
+def libVersion = '1.0.2'
 def libDesc = 'This is an Android project allowing to realize a Dashboard View in the simplest way possible. And supports richfull animations'
 def libLicenses = ['Apache-2.0']
 def libVCSUrl = 'https://github.com/bytebeats/dashboardview.git'
