@@ -422,7 +422,7 @@ class DashBoardView : View {
             }
             canvas?.drawText(
                 dbvTitle, centerX - titleSizes[0] / 2,
-                centerY + titleSizes[1] + dbvTextPadding / 2, titlePaint
+                centerY + dbvTextPadding / 2, titlePaint
             )
         } else {//multiline
             val staticLayout = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -445,8 +445,7 @@ class DashBoardView : View {
             }
             canvas?.save()
             canvas?.translate(
-                if (titleSizes[0] > maxTextWidth) paddingLeft + rimDiff() + cursorDiff() else paddingLeft + rimDiff() + cursorDiff() + maxTextWidth / 2 - titleSizes[0] / 2,
-                centerY - dbvTextPadding / 2 - titleSizes[1] / 2
+                paddingLeft + rimDiff() + cursorDiff(), centerY - dbvTextPadding / 2 - titleSizes[1] / 2
             )
             staticLayout.draw(canvas)
             canvas?.restore()
