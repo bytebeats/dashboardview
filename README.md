@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'me.bytebeats:dashboardview:1.0.2'
+    implementation 'me.bytebeats:dbv:1.0.2'
 }
 ```
 
